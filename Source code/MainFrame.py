@@ -25,7 +25,7 @@ class MainFrame(QWidget):
         fontContent.setPointSize(12)
 
         fontProperty = QtGui.QFont()
-        fontProperty.setPointSize(8)
+        fontProperty.setPointSize(10)
 
         self.fileLabel = QLabel('Choose your CSV files:', self)
         self.fileLabel.setFont(fontTitle)
@@ -52,6 +52,8 @@ class MainFrame(QWidget):
         self.rb_IV = QRadioButton(self)
         self.rb_IV.setText('I-V')
         self.rb_IV.setFont(fontContent)
+        self.rb_IV.clicked.connect(self.IVClicked)
+        self.rb_CV.clicked.connect(self.CVClicked)
         layout.addWidget(self.rb_IV, 2, 9)
 
         self.groupCVIV = QButtonGroup(self)
@@ -62,21 +64,19 @@ class MainFrame(QWidget):
         self.directionLabel.setFont(fontTitle)
         layout.addWidget(self.directionLabel, 3, 7)
 
-        self.rb_double = QRadioButton(self)
-        self.rb_double.setText('double')
-        self.rb_double.setFont(fontContent)
-        layout.addWidget(self.rb_double, 3, 8)
         self.rb_single = QRadioButton(self)
         self.rb_single.setText('single')
         self.rb_single.setFont(fontContent)
-        self.rb_double.setChecked(True)
-        self.rb_IV.clicked.connect(self.IVClicked)
-        self.rb_CV.clicked.connect(self.CVClicked)
-        layout.addWidget(self.rb_single, 3, 9)
+        self.rb_single.setChecked(True)
+        layout.addWidget(self.rb_single, 3, 8)
+        self.rb_double = QRadioButton(self)
+        self.rb_double.setText('double')
+        self.rb_double.setFont(fontContent)
+        layout.addWidget(self.rb_double, 3, 9)
 
         self.groupDirection = QButtonGroup(self)
-        self.groupDirection.addButton(self.rb_double, 1)
         self.groupDirection.addButton(self.rb_single, 0)
+        self.groupDirection.addButton(self.rb_double, 1)
 
 
         self.myLabel1 = QLabel('NTU GIEE', self)
@@ -87,7 +87,8 @@ class MainFrame(QWidget):
         self.myLabel2.setFont(fontProperty)
         layout.addWidget(self.myLabel2, 3, 0)
 
-        self.myLabel3 = QLabel('Developed by W.C, Liao', self)
+        self.myLabel3 = QLabel('Developed by W.C, Liao                                                                          '
+                               '                   Please visit: \"https://github.com/RickyLiao5083/CVIVReader\" for more information.', self)
         self.myLabel3.setFont(fontProperty)
         layout.addWidget(self.myLabel3, 4, 0)
 
@@ -121,10 +122,12 @@ class MainFrame(QWidget):
                 name = file.rsplit('/', 1)[-1]
                 err = fetch.fetch(path, name, self.groupCVIV.checkedId(), self.groupDirection.checkedId())
                 if err:
-                    QMessageBox.warning(None, 'Error', 'The selection of C-V / I-V or Direction might not match the choosen file(s)!')
                     err_count += 1
-            if not err_count:
+            if err_count:
+                QMessageBox.warning(None, 'Error', 'The selection of C-V / I-V or Direction might not match the choosen file(s)!')
+            else:
                 QMessageBox.information(None, 'Message', 'Successfully generated!')
+
         elif not self.filePath:
             QMessageBox.warning(None, 'Error', 'Choose at least one C-V or I-V file!')
         else:
