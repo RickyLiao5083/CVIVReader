@@ -5,7 +5,7 @@ Only C-V and I-V are accepted.
 
 The executable file (CVIVReadeer.exe) can be downloaded from:
 
-https://drive.google.com/file/d/1J-RBEpjEOv7zrOQxgOkmAxZUmwAF4IzQ/view?usp=sharing.
+https://drive.google.com/drive/folders/1UpWr1kb85wR5M4W1d9ZGoHKqC7Pc54Ve?usp=sharing.
 
 You can download the source code and customize it by yourself.
 
