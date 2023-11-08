@@ -19,13 +19,13 @@ def fetch(path, name, CVorIV, direction):
         matrix = np.array(table)
         Vbegin = matrix[0, 1].astype(float)
         V = matrix[:, 1].astype(float)
-        step = V[1] - V[0]
+        step = V[1] - V[0] if len(V) > 1 else 1
         Vmax = max(V)
         Vmin = min(V)
+        Vend = Vmax if Vbegin == Vmin else Vmin
+        period = round((Vend - Vbegin) / step + 1)
+        V1 = matrix[0:period, 1]
         if CVorIV:                     #C-V
-            Vend = Vmax if Vbegin == Vmin else Vmin
-            period = round((Vend - Vbegin) / step + 1)
-            V1 = matrix[0:period, 1]
             if direction:
                 N = int(len(V) / period / 2)
                 V2 = matrix[period:period * 2, 1]
@@ -42,14 +42,6 @@ def fetch(path, name, CVorIV, direction):
                 for i in range(0, N):
                     result[i + 1] = matrix[period * i:period * i + period, 3]
         else:                     #I-V
-            if Vbegin == Vmin:
-                Vend = Vmax
-                step = 0.02
-            else:
-                Vend = Vmin
-                step = -0.02
-            period = round((Vend - Vbegin) / step + 1)
-            V1 = matrix[0:period, 1]
             V2 = matrix[period:, 1]
             result = [None] * 4
             result[0] = V1
