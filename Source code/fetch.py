@@ -3,7 +3,7 @@ import numpy as np
 
 
 #CVorIV = 1 => C-V, CVorIV = 0 => I-V. direction = 1 => double, direction = 0 => single.
-def fetch(path, name, CVorIV, direction):
+def fetch(path, name, direction, dataColumn):
     file = path + name
     try:
         with open(file, "r", newline='', encoding="utf-8") as csvfile:
@@ -25,29 +25,23 @@ def fetch(path, name, CVorIV, direction):
         Vend = Vmax if Vbegin == Vmin else Vmin
         period = round((Vend - Vbegin) / step + 1)
         V1 = matrix[0:period, 1]
-        if CVorIV:                     #C-V
-            if direction:
-                N = int(len(V) / period / 2)
-                V2 = matrix[period:period * 2, 1]
-                result = [None] * (N * 2 + 2)
-                result[0] = V1
-                result[N + 1] = V2
-                for i in range(0, N):
-                    result[i + 1] = matrix[period * 2 * i:period * 2 * i + period, 3]
-                    result[i + N + 2] = matrix[period * (2 * i + 1):period * (2 * i + 1) + period, 3]
-            else:
-                N = int(len(V) / period)
-                result = [None] * (N + 1)
-                result[0] = V1
-                for i in range(0, N):
-                    result[i + 1] = matrix[period * i:period * i + period, 3]
-        else:                     #I-V
-            V2 = matrix[period:, 1]
-            result = [None] * 4
+
+        if direction:
+            N = int(len(V) / period / 2)
+            V2 = matrix[period:period * 2, 1]
+            result = [None] * (N * 2 + 2)
             result[0] = V1
-            result[2] = V2
-            result[1] = matrix[0:period, 3]
-            result[3] = matrix[period:, 3]
+            result[N + 1] = V2
+            for i in range(0, N):
+                result[i + 1] = matrix[period * 2 * i:period * 2 * i + period, dataColumn]
+                result[i + N + 2] = matrix[period * (2 * i + 1):period * (2 * i + 1) + period, dataColumn]
+        else:
+            N = int(len(V) / period)
+            result = [None] * (N + 1)
+            result[0] = V1
+            for i in range(0, N):
+                result[i + 1] = matrix[period * i:period * i + period, dataColumn]
+
         output = np.array(result)
         output = output.T
         newFile = path + 'output_' + name

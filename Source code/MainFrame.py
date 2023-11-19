@@ -11,7 +11,7 @@ class MainFrame(QWidget):
         self.filePath = []
 
     def initUI(self):
-        self.setWindowTitle('C-V & I-V Reader')
+        self.setWindowTitle('B1500A CSV Reader')
         self.setGeometry(0, 0, 2850, 1650)
 
         layout = QGridLayout()
@@ -41,43 +41,34 @@ class MainFrame(QWidget):
         self.btnOpen.clicked.connect(self.open)
         layout.addWidget(self.btnOpen, 1, 7)
 
-        self.CVIVLabel = QLabel('C-V / I-V:', self)
-        self.CVIVLabel.setFont(fontTitle)
-        layout.addWidget(self.CVIVLabel, 2, 7)
-
-        self.rb_CV = QRadioButton(self)
-        self.rb_CV.setText('C-V')
-        self.rb_CV.setFont(fontContent)
-        layout.addWidget(self.rb_CV, 2, 8)
-        self.rb_IV = QRadioButton(self)
-        self.rb_IV.setText('I-V')
-        self.rb_IV.setFont(fontContent)
-        self.rb_IV.clicked.connect(self.IVClicked)
-        self.rb_CV.clicked.connect(self.CVClicked)
-        layout.addWidget(self.rb_IV, 2, 9)
-
-        self.groupCVIV = QButtonGroup(self)
-        self.groupCVIV.addButton(self.rb_CV, 1)
-        self.groupCVIV.addButton(self.rb_IV, 0)
-
         self.directionLabel = QLabel('Direction:', self)
         self.directionLabel.setFont(fontTitle)
-        layout.addWidget(self.directionLabel, 3, 7)
+        layout.addWidget(self.directionLabel, 2, 7)
 
         self.rb_single = QRadioButton(self)
         self.rb_single.setText('single')
         self.rb_single.setFont(fontContent)
-        self.rb_single.setChecked(True)
-        layout.addWidget(self.rb_single, 3, 8)
+        layout.addWidget(self.rb_single, 2, 8)
         self.rb_double = QRadioButton(self)
         self.rb_double.setText('double')
         self.rb_double.setFont(fontContent)
-        layout.addWidget(self.rb_double, 3, 9)
+        layout.addWidget(self.rb_double, 2, 9)
 
         self.groupDirection = QButtonGroup(self)
         self.groupDirection.addButton(self.rb_single, 0)
         self.groupDirection.addButton(self.rb_double, 1)
 
+        self.readColumnLabel = QLabel('Data column:', self)
+        self.readColumnLabel.setFont(fontTitle)
+        layout.addWidget(self.readColumnLabel, 3, 7)
+
+        self.dataColumnBox = QtWidgets.QComboBox(self)
+        self.columnList = ['A', 'B', 'C', 'D (default)', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+                           'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        self.dataColumnBox.addItems(self.columnList)
+        self.dataColumnBox.setCurrentIndex(3)
+        self.dataColumnBox.setFont(fontContent)
+        layout.addWidget(self.dataColumnBox, 3, 8)
 
         self.myLabel1 = QLabel('NTU GIEE', self)
         self.myLabel1.setFont(fontProperty)
@@ -87,24 +78,17 @@ class MainFrame(QWidget):
         self.myLabel2.setFont(fontProperty)
         layout.addWidget(self.myLabel2, 3, 0)
 
-        self.myLabel3 = QLabel('Developed by W.C, Liao                                                                          '
-                               '                   Please visit: \"https://github.com/RickyLiao5083/CVIVReader\" for more information.', self)
+        self.myLabel3 = QLabel(
+            'Developed by W.C, Liao' + ' ' * 90 +
+            'Please visit: \"https://github.com/RickyLiao5083/B1500AReader\" for more information.', self)
         self.myLabel3.setFont(fontProperty)
         layout.addWidget(self.myLabel3, 4, 0)
-
 
         self.btnOK = QtWidgets.QPushButton(self)  # 加入按鈕
         self.btnOK.setText('確定')
         self.btnOK.setFont(fontTitle)
         self.btnOK.clicked.connect(self.OK)
         layout.addWidget(self.btnOK, 4, 7)
-
-    def IVClicked(self):
-        self.rb_double.setChecked(True)
-        self.rb_single.setDisabled(True)
-
-    def CVClicked(self):
-        self.rb_single.setDisabled(False)
 
     def open(self):
         self.filePath, filterType = QtWidgets.QFileDialog.getOpenFileNames(filter='CSV (*.csv)')  # 選擇檔案對話視窗
@@ -115,20 +99,20 @@ class MainFrame(QWidget):
         self.fileInput.setPlainText(allFiles.strip())
 
     def OK(self):
-        if self.filePath and (self.rb_CV.isChecked() or self.rb_IV.isChecked()):
+        if self.filePath and (self.rb_single.isChecked() or self.rb_double.isChecked()):
             err_count = 0
             for file in self.filePath:
                 path = file.rsplit('/', 1)[0] + '/'
                 name = file.rsplit('/', 1)[-1]
-                err = fetch.fetch(path, name, self.groupCVIV.checkedId(), self.groupDirection.checkedId())
+                err = fetch.fetch(path, name, self.groupDirection.checkedId(), self.dataColumnBox.currentIndex())
                 if err:
                     err_count += 1
             if err_count:
-                QMessageBox.warning(None, 'Error', 'The selection of C-V / I-V or Direction might not match the choosen file(s)!')
+                QMessageBox.critical(None, 'Error', 'The selected Direction or Data column might not match the choosen file(s)!')
             else:
                 QMessageBox.information(None, 'Message', 'Successfully generated!')
 
         elif not self.filePath:
-            QMessageBox.warning(None, 'Error', 'Choose at least one C-V or I-V file!')
+            QMessageBox.warning(None, 'Warning', 'Choose at least one CSV file!')
         else:
-            QMessageBox.warning(None, 'Error', 'Choose C-V or I-V!')
+            QMessageBox.warning(None, 'Warning', 'Choose Direction!')
