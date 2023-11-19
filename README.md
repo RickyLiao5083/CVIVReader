@@ -1,4 +1,4 @@
-# CVIVReader
+# B1500AReader
 This APP can fetch all the CSV files exported from B1500A.
 
 The executable file (B1500AReader.exe) can be downloaded from:
