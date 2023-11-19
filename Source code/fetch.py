@@ -2,11 +2,10 @@ import csv
 import numpy as np
 
 
-#CVorIV = 1 => C-V, CVorIV = 0 => I-V. direction = 1 => double, direction = 0 => single.
-def fetch(path, name, direction, dataColumn):
+def fetch(path, name, dataColumn):
     file = path + name
     try:
-        with open(file, "r", newline='', encoding="utf-8") as csvfile:
+        with open(file, 'r', newline='', encoding="utf-8") as csvfile:
             dataframe = csv.reader(csvfile)
             table = []
             flag = 0
@@ -25,8 +24,9 @@ def fetch(path, name, direction, dataColumn):
         Vend = Vmax if Vbegin == Vmin else Vmin
         period = round((Vend - Vbegin) / step + 1)
         V1 = matrix[0:period, 1]
+        direction = 1 if (len(V) / len(V1)) % 2 == 0 and V[0] == V[2 * period - 1] and V[period - 1] == V[period] else 0
 
-        if direction:
+        if direction:  # Double
             N = int(len(V) / period / 2)
             V2 = matrix[period:period * 2, 1]
             result = [None] * (N * 2 + 2)
@@ -35,7 +35,7 @@ def fetch(path, name, direction, dataColumn):
             for i in range(0, N):
                 result[i + 1] = matrix[period * 2 * i:period * 2 * i + period, dataColumn]
                 result[i + N + 2] = matrix[period * (2 * i + 1):period * (2 * i + 1) + period, dataColumn]
-        else:
+        else:  # Single
             N = int(len(V) / period)
             result = [None] * (N + 1)
             result[0] = V1

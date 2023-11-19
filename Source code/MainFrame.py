@@ -1,6 +1,5 @@
 from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtWidgets import (QWidget, QGridLayout, QLabel, QPlainTextEdit, QRadioButton, QButtonGroup,
-                             QMessageBox)
+from PyQt5.QtWidgets import (QWidget, QGridLayout, QLabel, QPlainTextEdit, QMessageBox)
 import fetch
 
 
@@ -35,40 +34,23 @@ class MainFrame(QWidget):
         self.fileInput.setFont(fontContent)
         layout.addWidget(self.fileInput, 1, 0)
 
-        self.btnOpen = QtWidgets.QPushButton(self)  # 加入按鈕
+        self.btnOpen = QtWidgets.QPushButton(self)
         self.btnOpen.setText('選擇檔案')
         self.btnOpen.setFont(fontTitle)
         self.btnOpen.clicked.connect(self.open)
         layout.addWidget(self.btnOpen, 1, 7)
 
-        self.directionLabel = QLabel('Direction:', self)
-        self.directionLabel.setFont(fontTitle)
-        layout.addWidget(self.directionLabel, 2, 7)
-
-        self.rb_single = QRadioButton(self)
-        self.rb_single.setText('single')
-        self.rb_single.setFont(fontContent)
-        layout.addWidget(self.rb_single, 2, 8)
-        self.rb_double = QRadioButton(self)
-        self.rb_double.setText('double')
-        self.rb_double.setFont(fontContent)
-        layout.addWidget(self.rb_double, 2, 9)
-
-        self.groupDirection = QButtonGroup(self)
-        self.groupDirection.addButton(self.rb_single, 0)
-        self.groupDirection.addButton(self.rb_double, 1)
-
         self.readColumnLabel = QLabel('Data column:', self)
         self.readColumnLabel.setFont(fontTitle)
-        layout.addWidget(self.readColumnLabel, 3, 7)
+        layout.addWidget(self.readColumnLabel, 2, 7)
 
         self.dataColumnBox = QtWidgets.QComboBox(self)
-        self.columnList = ['A', 'B', 'C', 'D (default)', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-                           'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        self.columnList = [chr(ord('A') + i) for i in range(26)]
+        self.columnList[3] = 'D (default)'
         self.dataColumnBox.addItems(self.columnList)
         self.dataColumnBox.setCurrentIndex(3)
         self.dataColumnBox.setFont(fontContent)
-        layout.addWidget(self.dataColumnBox, 3, 8)
+        layout.addWidget(self.dataColumnBox, 2, 8)
 
         self.myLabel1 = QLabel('NTU GIEE', self)
         self.myLabel1.setFont(fontProperty)
@@ -84,7 +66,7 @@ class MainFrame(QWidget):
         self.myLabel3.setFont(fontProperty)
         layout.addWidget(self.myLabel3, 4, 0)
 
-        self.btnOK = QtWidgets.QPushButton(self)  # 加入按鈕
+        self.btnOK = QtWidgets.QPushButton(self)
         self.btnOK.setText('確定')
         self.btnOK.setFont(fontTitle)
         self.btnOK.clicked.connect(self.OK)
@@ -99,20 +81,18 @@ class MainFrame(QWidget):
         self.fileInput.setPlainText(allFiles.strip())
 
     def OK(self):
-        if self.filePath and (self.rb_single.isChecked() or self.rb_double.isChecked()):
+        if self.filePath:
             err_count = 0
             for file in self.filePath:
                 path = file.rsplit('/', 1)[0] + '/'
                 name = file.rsplit('/', 1)[-1]
-                err = fetch.fetch(path, name, self.groupDirection.checkedId(), self.dataColumnBox.currentIndex())
+                err = fetch.fetch(path, name, self.dataColumnBox.currentIndex())
                 if err:
                     err_count += 1
             if err_count:
-                QMessageBox.critical(None, 'Error', 'The selected Direction or Data column might not match the choosen file(s)!')
+                QMessageBox.critical(None, 'Error', 'The selected Data column might not match the chosen file(s)!')
             else:
                 QMessageBox.information(None, 'Message', 'Successfully generated!')
 
-        elif not self.filePath:
-            QMessageBox.warning(None, 'Warning', 'Choose at least one CSV file!')
         else:
-            QMessageBox.warning(None, 'Warning', 'Choose Direction!')
+            QMessageBox.warning(None, 'Warning', 'Choose at least one CSV file!')
