@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtWidgets import (QWidget, QGridLayout, QLabel, QPlainTextEdit, QMessageBox)
+from PyQt5.QtWidgets import (QWidget, QGridLayout, QLabel, QPlainTextEdit, QMessageBox, QTextBrowser)
 import fetch
 
 
@@ -40,37 +40,54 @@ class MainFrame(QWidget):
         self.btnOpen.clicked.connect(self.open)
         layout.addWidget(self.btnOpen, 1, 7)
 
-        self.readColumnLabel = QLabel('Data column:', self)
-        self.readColumnLabel.setFont(fontTitle)
-        layout.addWidget(self.readColumnLabel, 2, 7)
+        self.XColumnLabel = QLabel('X Data column:', self)
+        self.XColumnLabel.setFont(fontTitle)
+        layout.addWidget(self.XColumnLabel, 2, 7)
 
-        self.dataColumnBox = QtWidgets.QComboBox(self)
-        self.columnList = [chr(ord('A') + i) for i in range(26)]
-        self.columnList[3] = 'D (default)'
-        self.dataColumnBox.addItems(self.columnList)
-        self.dataColumnBox.setCurrentIndex(3)
-        self.dataColumnBox.setFont(fontContent)
-        layout.addWidget(self.dataColumnBox, 2, 8)
+        self.XdataColumnBox = QtWidgets.QComboBox(self)
+        self.XcolumnList = [chr(ord('B') + i) for i in range(25)]
+        self.XcolumnList[0] = 'B (default)'
+        self.XdataColumnBox.addItems(self.XcolumnList)
+        self.XdataColumnBox.setCurrentIndex(0)
+        self.XdataColumnBox.setFont(fontContent)
+        layout.addWidget(self.XdataColumnBox, 2, 8)
 
-        self.myLabel1 = QLabel('NTU GIEE', self)
+        self.YColumnLabel = QLabel('Y Data column:', self)
+        self.YColumnLabel.setFont(fontTitle)
+        layout.addWidget(self.YColumnLabel, 3, 7)
+
+        self.YdataColumnBox = QtWidgets.QComboBox(self)
+        self.YcolumnList = [chr(ord('B') + i) for i in range(25)]
+        self.YcolumnList[2] = 'D (default)'
+        self.YdataColumnBox.addItems(self.YcolumnList)
+        self.YdataColumnBox.setCurrentIndex(2)
+        self.YdataColumnBox.setFont(fontContent)
+        layout.addWidget(self.YdataColumnBox, 3, 8)
+
+        self.myLabel1 = QLabel('NTU GIEE C-V Lab', self)
         self.myLabel1.setFont(fontProperty)
         layout.addWidget(self.myLabel1, 2, 0)
 
-        self.myLabel2 = QLabel('C-V Lab', self)
+        self.myLabel2 = QLabel('Developed by Wei-chi, Liao', self)
         self.myLabel2.setFont(fontProperty)
         layout.addWidget(self.myLabel2, 3, 0)
 
-        self.myLabel3 = QLabel(
-            'Developed by W.C, Liao' + ' ' * 90 +
-            'Please visit: \"https://github.com/RickyLiao5083/B1500AReader\" for more information.', self)
-        self.myLabel3.setFont(fontProperty)
-        layout.addWidget(self.myLabel3, 4, 0)
+        self.myLabel2 = QLabel(
+            'Please visit the the website for more information:', self)
+        self.myLabel2.setFont(fontProperty)
+        layout.addWidget(self.myLabel2, 4, 0)
+
+        self.text_browser = QLabel()
+        self.text_browser.setOpenExternalLinks(True)
+        self.text_browser.setText("<a href='https://github.com/RickyLiao5083/B1500AReader/'>https://github.com/RickyLiao5083/B1500AReader</a>")
+        self.text_browser.setFont(fontProperty)
+        layout.addWidget(self.text_browser, 5, 0)
 
         self.btnOK = QtWidgets.QPushButton(self)
         self.btnOK.setText('確定')
         self.btnOK.setFont(fontTitle)
         self.btnOK.clicked.connect(self.OK)
-        layout.addWidget(self.btnOK, 4, 7)
+        layout.addWidget(self.btnOK, 5, 7)
 
     def open(self):
         self.filePath, filterType = QtWidgets.QFileDialog.getOpenFileNames(filter='CSV (*.csv)')  # 選擇檔案對話視窗
@@ -86,7 +103,7 @@ class MainFrame(QWidget):
             for file in self.filePath:
                 path = file.rsplit('/', 1)[0] + '/'
                 name = file.rsplit('/', 1)[-1]
-                err = fetch.fetch(path, name, self.dataColumnBox.currentIndex())
+                err = fetch.fetch(path, name, self.XdataColumnBox.currentIndex() + 1, self.YdataColumnBox.currentIndex() + 1)
                 if err:
                     err_count += 1
             if err_count:
