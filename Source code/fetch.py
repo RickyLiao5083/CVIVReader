@@ -36,10 +36,11 @@ def fetch(path, name, dataColumn):
                 result[i + 1] = matrix[period * 2 * i:period * 2 * i + period, dataColumn]
                 result[i + N + 2] = matrix[period * (2 * i + 1):period * (2 * i + 1) + period, dataColumn]
         else:  # Single
-            N = int(len(V) / period)
+            N = round(len(V) / period) if len(V) % period == 0 else 1  # 1 is for the non-uniform step like I-t
             result = [None] * (N + 1)
             result[0] = V1
             for i in range(0, N):
+                print(i)
                 result[i + 1] = matrix[period * i:period * i + period, dataColumn]
 
         output = np.array(result)
